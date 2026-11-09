@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>apilab · API workbench</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src *; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:,">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('apilab.theme')==='light'?'light':'dark'}catch(e){document.documentElement.dataset.theme='dark'}</script>
+<style>
+:root{color-scheme:dark;--k:#7dd3fc;--s:#a7f3d0;--nu:#fbbf24;--b:#c4a1ff;--onac:#04201c;--bg:#0c1014;--pn:#121820;--pn2:#171f29;--ln:#232d39;--tx:#cdd9e5;--dim:#6e7f90;--ac:#5eead4;--ok:#4ade80;--er:#ff6b7a;
+--GET:#5eead4;--POST:#fbbf24;--PUT:#60a5fa;--PATCH:#c4a1ff;--DELETE:#ff6b7a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="light"]{color-scheme:light;--bg:#f4f6f8;--pn:#fff;--pn2:#eef1f5;--ln:#d7dde5;--tx:#1b2430;--dim:#677385;--ac:#0b6e63;--ok:#0f8a5f;--er:#d1344b;--GET:#0f8a5f;--POST:#b86e00;--PUT:#2563eb;--PATCH:#7c3aed;--DELETE:#d1344b;--k:#1d4ed8;--s:#0f766e;--nu:#b45309;--b:#7c3aed;--onac:#fff}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.5 ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:var(--pn2);border:1px solid var(--ln);border-radius:4px;padding:4px 10px}
+button:hover{border-color:var(--ac)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+input,select,textarea{background:var(--bg);border:1px solid var(--ln);border-radius:4px;padding:6px 8px;width:100%}
+textarea{resize:vertical;min-height:140px;line-height:1.5}
+.app{display:grid;grid-template-columns:290px 1fr;height:100vh;height:100dvh}
+aside{background:var(--pn);border-right:1px solid var(--ln);display:flex;flex-direction:column;min-height:0}
+.brand{padding:14px 14px 6px;color:var(--dim);display:flex;justify-content:space-between;align-items:center}.theme{font-size:11px;padding:2px 9px;border-radius:99px}.brand b{color:var(--ac);font-weight:600}
+.proj{padding:6px 14px 12px;border-bottom:1px solid var(--ln)}
+.proj label{color:var(--dim);display:block;margin-bottom:3px}
+.proj input{font-weight:600;color:var(--ac)}
+.tree{flex:1;overflow:auto;padding:8px}
+.fold{margin-bottom:4px}
+.fh{display:flex;align-items:center;gap:4px;padding:2px 4px;border-radius:4px}
+.fh:hover{background:var(--pn2)}
+.fh input{border:0;background:transparent;padding:2px 4px;font-weight:500}
+.fh button,.rq button{border:0;background:none;padding:0 6px;color:var(--dim)}
+.fh button:hover,.rq button:hover{color:var(--er)}
+.caret{color:var(--dim);width:14px;text-align:center}
+.rq{display:flex;align-items:center;gap:6px;padding:3px 6px 3px 22px;border-left:1px solid var(--ln);margin-left:10px;cursor:pointer;border-radius:0 4px 4px 0}
+.rq:hover{background:var(--pn2)}.rq.sel{background:var(--pn2);border-left-color:var(--ac)}
+.rq span.n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.m{font-size:10.5px;font-weight:600;min-width:46px}
+.keep{display:flex;gap:6px;align-items:center;margin:0 10px;color:var(--dim);font-size:11px}.keep input{width:auto}
+.addf{margin:8px;border-style:dashed;color:var(--dim)}
+main{display:flex;flex-direction:column;min-width:0;min-height:0}
+#edit{padding:14px;border-bottom:1px solid var(--ln);overflow:auto;max-height:55%}
+.crumb{color:var(--dim);margin-bottom:8px;display:flex;gap:8px;align-items:center}
+.crumb input{border:0;background:transparent;color:var(--tx);font-weight:600;width:auto;flex:1;padding:0}
+.bar{display:flex;gap:0;border:1px solid var(--ln);border-radius:6px;background:var(--pn);overflow:hidden}
+.bar select{width:110px;border:0;border-right:1px solid var(--ln);border-radius:0;font-weight:600;background:var(--pn2)}
+.bar input{border:0;border-radius:0;background:transparent;flex:1}
+.bar .go{border:0;border-radius:0;background:var(--ac);color:var(--onac);font-weight:600;padding:0 18px}
+.tabs{display:flex;gap:2px;margin:12px 0 10px;border-bottom:1px solid var(--ln)}
+.tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;color:var(--dim);padding:6px 12px}
+.tabs button.on{color:var(--ac);border-bottom-color:var(--ac)}
+.row{display:grid;grid-template-columns:22px 1fr 1.4fr 28px;gap:6px;margin-bottom:6px;align-items:center}
+.row input[type=checkbox]{width:auto}
+.f{display:grid;grid-template-columns:130px 1fr;gap:6px 10px;align-items:center;max-width:720px}
+.f label{color:var(--dim)}
+.hint{color:var(--dim);margin:8px 0}
+.act{margin-top:10px;display:flex;gap:8px;align-items:center}
+#resp{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 14px}
+.rh{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.pill{padding:1px 10px;border-radius:99px;font-weight:600;border:1px solid}
+.pre{flex:1;overflow:auto;background:var(--pn);border:1px solid var(--ln);border-radius:6px;padding:10px;margin:0;white-space:pre-wrap;word-break:break-all}
+.k{color:var(--k)}.s{color:var(--s)}.nu{color:var(--nu)}.b{color:var(--b)}
+.empty{color:var(--dim);margin:auto;text-align:center}
+.cur{display:inline-block;width:8px;height:14px;background:var(--ac);vertical-align:-2px;animation:bl 1.1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.cur{animation:none}}
+@media(max-width:760px){.app{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:auto}aside{max-height:42vh}.f{grid-template-columns:1fr}#edit{max-height:none}#resp{min-height:320px}}
+</style></head><body>
+<div class="app">
+<aside>
+ <div class="brand"><span><b>apilab</b> <span class="cur"></span></span><button class="theme" id="theme" data-a="theme" title="Switch between dark and light theme"></button></div>
+ <div class="proj"><label for="ps">project</label><div style="display:flex;gap:4px"><select id="ps" data-ps></select><button data-a="np" title="New project">+</button><button data-a="dp" title="Delete project">×</button></div><input id="pn" data-pn placeholder="Project name" style="margin-top:6px"></div>
+ <div class="tree" id="tree"></div>
+ <label class="keep"><input type="checkbox" data-keep checked> save tokens and passwords in this browser</label>
+ <button class="addf" data-a="af">+ new folder</button>
+</aside>
+<main><div id="edit"></div><div id="resp"></div></main>
+</div>
+<script>
+const KEY='apilab.v3',METHODS=['GET','POST','PUT','PATCH','DELETE'];
+const uid=()=>Math.random().toString(36).slice(2,8);
+const mk=(name,method,url,x={})=>({id:uid(),name,method,url,params:[],headers:[],bodyType:'none',body:'',auth:{type:'none'},...x});
+const JH=[{k:'Content-Type',v:'application/json',on:true}];
+function seed(){return {id:uid(),name:'My Project',folders:[]};}
+let O;try{O=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('apilab.v2'))}catch(e){}
+let S=O&&O.projects?O:O&&O.folders?{projects:[{id:uid(),name:O.project,folders:O.folders}],sel:O.sel}:null;
+if(!S||!S.projects.length){const p=seed();S={projects:[p],sel:null}}
+S.pid=S.pid||S.projects[0].id;
+S.projects.forEach(p=>p.folders.forEach(f=>f.reqs.forEach(r=>{if(!['GET','POST','PUT','PATCH','DELETE'].includes(r.method))r.method='GET'})));
+const P=()=>S.projects.find(p=>p.id===S.pid)||S.projects[0];
+const SEC=/authorization|api-?key|token|secret|cookie|password/i;
+const scrub=o=>{const c=JSON.parse(JSON.stringify(o));c.projects.forEach(p=>p.folders.forEach(f=>f.reqs.forEach(r=>{['token','value','pass','secret','clientSecret'].forEach(k=>{if(r.auth[k])r.auth[k]=''});[...r.headers,...r.params].forEach(h=>{if(SEC.test(h.k))h.v=''})})));return c};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S.keep===false?scrub(S):S))}catch(e){}};
+const ui={tab:'params',rtab:'body'},R={};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const all=()=>P().folders.flatMap(f=>f.reqs.map(r=>({f,r})));
+const cur=()=>(all().find(x=>x.r.id===S.sel)||{}).r;
+const curF=()=>(all().find(x=>x.r.id===S.sel)||{}).f;
+
+const AUTH={
+ none:{l:'No auth',f:[]},
+ apikey:{l:'API key',f:[{k:'key',l:'Key name'},{k:'value',l:'Value',p:1},{k:'in',l:'Add to',o:['header','query']}],d:{key:'X-API-Key',in:'header'}},
+ bearer:{l:'Bearer token',f:[{k:'token',l:'Token',p:1},{k:'prefix',l:'Prefix'}],d:{prefix:'Bearer'}},
+ jwt:{l:'JWT (HS256)',f:[{k:'secret',l:'Secret',p:1},{k:'payload',l:'Payload',t:1},{k:'prefix',l:'Prefix'}],d:{prefix:'Bearer',payload:'{\n  "sub": "1234567890",\n  "name": "Asha"\n}'}},
+ basic:{l:'Basic auth',f:[{k:'user',l:'Username'},{k:'pass',l:'Password',p:1}]},
+ oauth2:{l:'OAuth 2.0',f:[{k:'token',l:'Access token',p:1},{k:'prefix',l:'Prefix'},{k:'tokenUrl',l:'Token URL'},{k:'clientId',l:'Client ID'},{k:'clientSecret',l:'Client secret',p:1},{k:'scope',l:'Scope'}],d:{prefix:'Bearer'}},
+ custom:{l:'Custom header',f:[{k:'name',l:'Header name'},{k:'value',l:'Header value'}],d:{name:'Authorization'}}
+};
+
+function side(){
+ document.querySelector('[data-keep]').checked=S.keep!==false;
+ $('ps').innerHTML=S.projects.map(p=>`<option value="${p.id}" ${p.id===S.pid?'selected':''}>${esc(p.name||'untitled')}</option>`).join('');$('pn').value=P().name;
+ $('tree').innerHTML=P().folders.map(f=>`<div class="fold"><div class="fh"><span class="caret" data-a="tf" data-f="${f.id}" style="cursor:pointer">${f.open?'▾':'▸'}</span><input data-fn="${f.id}" value="${esc(f.name)}" aria-label="Folder name"><button data-a="ar" data-f="${f.id}" title="Add API">+</button><button data-a="df" data-f="${f.id}" title="Delete folder">×</button></div>${f.open?f.reqs.map(r=>`<div class="rq ${r.id===S.sel?'sel':''}" data-a="sr" data-r="${r.id}"><span class="m" style="color:var(--${r.method})">${r.method}</span><span class="n">${esc(r.name)}</span><button data-a="dr" data-r="${r.id}" title="Delete API">×</button></div>`).join('')||'<div class="hint" style="padding-left:24px">no APIs yet</div>':''}</div>`).join('')||'<div class="hint">Create a folder for a menu or feature.</div>';
+}
+function rows(t,r){return r[t].map((p,i)=>`<div class="row"><input type="checkbox" data-row="${t}" data-i="${i}" data-c="on" ${p.on?'checked':''}><input data-row="${t}" data-i="${i}" data-c="k" value="${esc(p.k)}" placeholder="key"><input data-row="${t}" data-i="${i}" data-c="v" value="${esc(p.v)}" placeholder="value"><button data-a="delrow" data-t="${t}" data-i="${i}">×</button></div>`).join('')+`<button data-a="addrow" data-t="${t}">+ add</button>`;}
+function panel(r){
+ if(ui.tab==='params')return rows('params',r)+'<div class="hint">Enabled params are appended to the URL as a query string.</div>';
+ if(ui.tab==='headers')return rows('headers',r);
+ if(ui.tab==='body')return `<div class="f" style="margin-bottom:8px"><label>Body type</label><select data-b="bodyType">${[['none','None'],['json','JSON'],['form','Form (key=value per line)'],['raw','Raw text']].map(o=>`<option value="${o[0]}" ${r.bodyType===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>${r.bodyType==='none'?'<div class="hint">This request has no body.</div>':`<textarea data-b="body" spellcheck="false">${esc(r.body)}</textarea>`}`;
+ const a=r.auth,def=AUTH[a.type];
+ return `<div class="f" style="margin-bottom:10px"><label>Type</label><select data-b="auth.type">${Object.keys(AUTH).map(k=>`<option value="${k}" ${a.type===k?'selected':''}>${AUTH[k].l}</option>`).join('')}</select></div><div class="f">${def.f.map(x=>`<label>${x.l}</label>${x.o?`<select data-b="auth.${x.k}">${x.o.map(o=>`<option ${a[x.k]===o?'selected':''}>${o}</option>`).join('')}</select>`:x.t?`<textarea data-b="auth.${x.k}" style="min-height:80px">${esc(a[x.k])}</textarea>`:`<input data-b="auth.${x.k}" type="${x.p?'password':'text'}" autocomplete="off" value="${esc(a[x.k])}">`}`).join('')}</div>${a.type==='oauth2'?'<div class="act"><button data-a="tok">Get token (client credentials)</button><span id="tokmsg" class="hint"></span></div>':''}${a.type==='none'?'<div class="hint">No credentials will be sent. Pick a type to attach them automatically.</div>':'<div class="hint">Credentials are added when you send, and are stored only in this browser.</div>'}`;
+}
+function ed(){
+ const r=cur(),f=curF();
+ if(!r){$('edit').innerHTML='<div class="empty">Select or add an API from the left.</div>';$('resp').innerHTML='';return;}
+ $('edit').innerHTML=`<div class="crumb"><span>${esc(P().name)} / ${esc(f.name)} /</span><input data-b="name" value="${esc(r.name)}" aria-label="API name"><button data-a="dup">duplicate</button></div>
+ <div class="bar"><select data-b="method" style="color:var(--${r.method})">${METHODS.map(m=>`<option ${m===r.method?'selected':''}>${m}</option>`).join('')}</select><input data-b="url" value="${esc(r.url)}" placeholder="https://api.example.com/v1/resource" spellcheck="false"><button class="go" data-a="send">Send</button></div>
+ <div class="tabs">${['params','headers','body','auth'].map(t=>`<button class="${ui.tab===t?'on':''}" data-a="tab" data-t="${t}">${t}${t==='params'&&r.params.length?' ('+r.params.length+')':''}${t==='headers'&&r.headers.length?' ('+r.headers.length+')':''}</button>`).join('')}</div>${panel(r)}`;
+ resp();
+}
+function hl(t){try{t=JSON.stringify(JSON.parse(t),null,2)}catch(e){return esc(t)}
+ return esc(t).replace(/(&quot;(?:\\.|[^&\\]|&(?!quot;))*?&quot;)(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+\.?\d*(?:[eE][+-]?\d+)?/g,(m,s,c,bo)=>s?(c?`<span class="k">${s}</span>${c}`:`<span class="s">${s}</span>`):bo?`<span class="b">${m}</span>`:m==='null'?`<span class="b">null</span>`:`<span class="nu">${m}</span>`);}
+function resp(){
+ const r=cur(),x=r&&R[r.id],el=$('resp');
+ if(!x){el.innerHTML='<div class="empty">Response appears here.<br>Hit Send to run the request <span class="cur"></span></div>';return;}
+ if(x.loading){el.innerHTML='<div class="empty">sending…</div>';return;}
+ if(x.err){el.innerHTML=`<div class="rh"><span class="pill" style="color:var(--er)">failed</span></div><pre class="pre" style="color:var(--er)">${esc(x.err)}\n\nFailed to fetch usually means one of three things: the server is not reachable, the server does not allow this site by CORS (it must allow this origin, your method and the Authorization or Content-Type headers), or an https page is calling a plain http server. Open the browser DevTools console to see the exact reason.</pre>`;return;}
+ const c=x.status<300?'var(--ok)':x.status<400?'var(--POST)':'var(--er)';
+ el.innerHTML=`<div class="rh"><span class="pill" style="color:${c};border-color:${c}">${x.status} ${esc(x.text)}</span><span>${x.ms} ms</span><span>${x.size}</span><span class="tabs" style="margin:0;border:0"><button class="${ui.rtab==='body'?'on':''}" data-a="rtab" data-t="body">body</button><button class="${ui.rtab==='headers'?'on':''}" data-a="rtab" data-t="headers">headers (${x.headers.length})</button></span><button data-a="copy" style="margin-left:auto">copy</button></div><pre class="pre">${ui.rtab==='body'?(x.body?hl(x.body):'<span style="color:var(--dim)">(empty body)</span>'):x.headers.map(h=>`<span class="k">${esc(h[0])}</span>: ${esc(h[1])}`).join('\n')}</pre>`;
+}
+const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+async function jwt(a){const E=new TextEncoder();let p;try{p=JSON.stringify(JSON.parse(a.payload||'{}'))}catch(e){throw Error('JWT payload is not valid JSON')}
+ const body=b64u(E.encode('{"alg":"HS256","typ":"JWT"}'))+'.'+b64u(E.encode(p));
+ const k=await crypto.subtle.importKey('raw',E.encode(a.secret||''),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+ return body+'.'+b64u(await crypto.subtle.sign('HMAC',k,E.encode(body)));}
+async function xfetch(method,href,headers,body){
+ const t0=performance.now(),res=await fetch(href,{method,headers,body,credentials:'omit',referrerPolicy:'no-referrer'}),txt=await res.text();
+ return{status:res.status,text:res.statusText,ms:Math.round(performance.now()-t0),txt,headers:[...res.headers.entries()]};}
+async function send(){
+ const r=cur();if(!r)return;let u=r.url.trim();if(!u)return;
+ R[r.id]={loading:1};resp();
+ try{
+  if(!/^https?:\/\//i.test(u))u='https://'+u;
+  const url=new URL(u),h={},a=r.auth;
+  r.params.filter(p=>p.on&&p.k).forEach(p=>url.searchParams.append(p.k,p.v));
+  r.headers.filter(p=>p.on&&p.k).forEach(p=>h[p.k]=p.v);
+  if(a.type==='apikey'&&a.key){a.in==='query'?url.searchParams.set(a.key,a.value||''):h[a.key]=a.value||''}
+  else if(a.type==='bearer'||a.type==='oauth2'){if(a.token)h.Authorization=(a.prefix?a.prefix+' ':'')+a.token}
+  else if(a.type==='jwt')h.Authorization=(a.prefix?a.prefix+' ':'')+await jwt(a);
+  else if(a.type==='basic')h.Authorization='Basic '+btoa(String.fromCharCode(...new TextEncoder().encode((a.user||'')+':'+(a.pass||''))));
+  else if(a.type==='custom'&&a.name)h[a.name]=a.value||'';
+  let body;const hasCT=Object.keys(h).some(k=>k.toLowerCase()==='content-type');
+  if(r.method!=='GET'&&r.bodyType!=='none'){
+   if(r.bodyType==='json'){body=r.body;if(!hasCT)h['Content-Type']='application/json'}
+   else if(r.bodyType==='form'){const q=new URLSearchParams();r.body.split('\n').filter(Boolean).forEach(l=>{const i=l.indexOf('=');q.append(i<0?l:l.slice(0,i),i<0?'':l.slice(i+1))});body=q.toString();if(!hasCT)h['Content-Type']='application/x-www-form-urlencoded'}
+   else body=r.body;}
+  const o=await xfetch(r.method,url.href,h,body),n=o.txt.length;
+  R[r.id]={status:o.status,text:o.text,ms:o.ms,size:n>1024?(n/1024).toFixed(1)+' KB':n+' B',body:o.txt,headers:o.headers};
+ }catch(e){R[r.id]={err:e.message||String(e)}}
+ if(cur()===r)resp();
+}
+async function tok(){const a=cur().auth,m=$('tokmsg');m.textContent='requesting…';
+ try{const q=new URLSearchParams({grant_type:'client_credentials',client_id:a.clientId||'',client_secret:a.clientSecret||'',scope:a.scope||''});
+  const d=JSON.parse((await xfetch('POST',a.tokenUrl,{'Content-Type':'application/x-www-form-urlencoded'},q.toString())).txt);
+  if(!d.access_token)throw Error('no access_token in response');a.token=d.access_token;save();ed();$('tokmsg').textContent='token saved';}
+ catch(e){m.textContent='failed: '+e.message}}
+
+document.addEventListener('click',e=>{
+ const t=e.target.closest('[data-a]');if(!t)return;const d=t.dataset,a=d.a,r=cur();
+ const F=id=>P().folders.find(f=>f.id===id);
+ if(a==='np'){const p={id:uid(),name:'New project',folders:[]};S.projects.push(p);S.pid=p.id;S.sel=null;side();save();return ed();}
+ if(a==='dp'){if(S.projects.length>1){S.projects=S.projects.filter(p=>p.id!==S.pid);S.pid=S.projects[0].id;const f=all()[0];S.sel=f&&f.r.id;}side();save();return ed();}
+ if(a==='theme'){const t=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=t;try{localStorage.setItem('apilab.theme',t)}catch(x){}th();return;}
+ if(a==='af'){P().folders.push({id:uid(),name:'New folder',open:true,reqs:[]});}
+ else if(a==='tf')F(d.f).open=!F(d.f).open;
+ else if(a==='df'){P().folders=P().folders.filter(f=>f.id!==d.f);if(!cur())S.sel=(all()[0]||{r:{}}).r.id;side();save();return ed();}
+ else if(a==='ar'){const n=mk('New request','GET','');F(d.f).reqs.push(n);F(d.f).open=true;S.sel=n.id;side();save();return ed();}
+ else if(a==='sr'){if(e.target.closest('[data-a=dr]'))return;S.sel=d.r;side();save();return ed();}
+ else if(a==='dr'){e.stopPropagation();P().folders.forEach(f=>f.reqs=f.reqs.filter(x=>x.id!==d.r));if(!cur())S.sel=(all()[0]||{r:{}}).r.id;side();save();return ed();}
+ else if(a==='dup'){const f=curF(),c=JSON.parse(JSON.stringify(r));c.id=uid();c.name+=' copy';f.reqs.push(c);S.sel=c.id;side();save();return ed();}
+ else if(a==='tab'){ui.tab=d.t;return ed();}
+ else if(a==='rtab'){ui.rtab=d.t;return resp();}
+ else if(a==='addrow'){r[d.t].push({k:'',v:'',on:true});ed();return save();}
+ else if(a==='delrow'){r[d.t].splice(+d.i,1);ed();return save();}
+ else if(a==='send')return send();
+ else if(a==='tok')return tok();
+ else if(a==='copy'){try{navigator.clipboard.writeText(R[r.id].body||'');t.textContent='copied'}catch(x){t.textContent='blocked'}return;}
+ side();save();
+});
+function onIn(e){
+ const t=e.target,d=t.dataset,r=cur();
+ if('keep' in d){S.keep=t.checked}
+ else if('ps' in d){S.pid=t.value;const f=all()[0];S.sel=f&&f.r.id;side();ed();}
+ else if('pn' in d){P().name=t.value;const o=$('ps').selectedOptions[0];if(o)o.textContent=t.value||'untitled'}
+ else if(d.fn)P().folders.find(f=>f.id===d.fn).name=t.value;
+ else if(d.row){r[d.row][+d.i][d.c]=d.c==='on'?t.checked:t.value}
+ else if(d.b&&r){const p=d.b.split('.');let o=r;for(let i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=t.value;
+  if(d.b==='auth.type'){r.auth={type:t.value,...(AUTH[t.value].d||{})};ed();}
+  else if(d.b==='bodyType'){if(t.value==='json'&&!r.headers.some(h=>/content-type/i.test(h.k)))r.headers.push({k:'Content-Type',v:'application/json',on:true});ed();}
+  else if(d.b==='method'){t.style.color=`var(--${t.value})`;side();}
+  else if(d.b==='name')side();}
+ save();
+}
+document.addEventListener('input',onIn);
+const th=()=>{$('theme').textContent=document.documentElement.dataset.theme==='light'?'☾ Dark':'☀ Light'};
+side();ed();th();
+</script></body></html>
